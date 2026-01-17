@@ -1,4 +1,3 @@
-
 set(HEADER_FILES
 		include/chiaki/session.h
 		include/chiaki/common.h
@@ -8,6 +7,7 @@ set(HEADER_FILES
 		include/chiaki/http.h
 		include/chiaki/log.h
 		include/chiaki/ctrl.h
+		include/chiaki/antirecoil.h
 		include/chiaki/rpcrypt.h
 		include/chiaki/takion.h
 		include/chiaki/senkusha.h
@@ -53,6 +53,7 @@ set(SOURCE_FILES
 		src/http.c
 		src/log.c
 		src/ctrl.c
+		src/antirecoil.c
 		src/rpcrypt.c
 		src/takion.c
 		src/senkusha.c
