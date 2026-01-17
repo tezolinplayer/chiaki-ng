@@ -1,28 +1,34 @@
-#pragma once
+#ifndef CHIAKI_ANTIRECOIL_H
+#define CHIAKI_ANTIRECOIL_H
 
-#include <stdint.h>
+#include <chiaki/common.h>
+#include <chiaki/ctrl.h>  // ← IMPORTANTE: incluir ctrl.h
 #include <stdbool.h>
-
-// --- CORREÇÃO: Importar as definições do controle aqui ---
-#include <chiaki/controller.h>
-#include <chiaki/ctrl.h>
-// ---------------------------------------------------------
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-// Configurações do Anti-Recoil
 typedef struct {
     bool enabled;
     float vertical_strength;
-    int fire_button; // Ex: CHIAKI_CONTROLLER_BUTTON_R2
+    float horizontal_strength;
+    int delay_ms;
+    bool adaptive;
+    uint32_t fire_button;
 } AntiRecoilConfig;
 
-// Funções
-void chiaki_antirecoil_init(void);
-void chiaki_antirecoil_process(ChiakiControllerState *state);
+CHIAKI_EXPORT void chiaki_antirecoil_init(AntiRecoilConfig *config);
+CHIAKI_EXPORT void chiaki_antirecoil_process(ChiakiControllerState *state);
+CHIAKI_EXPORT void chiaki_antirecoil_toggle(bool enabled);
+CHIAKI_EXPORT void chiaki_antirecoil_set_vertical_strength(float strength);
+CHIAKI_EXPORT void chiaki_antirecoil_set_horizontal_strength(float strength);
+CHIAKI_EXPORT void chiaki_antirecoil_set_fire_button(uint32_t button);
+CHIAKI_EXPORT bool chiaki_antirecoil_is_active(void);
 
 #ifdef __cplusplus
 }
+#endif
+
 #endif
