@@ -1,6 +1,8 @@
 #pragma once
 
-#include <chiaki/ctrl.h>
+// --- CORREÇÃO DE OURO: Importar ctrl.h aqui ---
+#include <chiaki/ctrl.h> 
+// ----------------------------------------------
 #include <stdbool.h>
 #include <stdint.h>
 
