@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LicenseRef-AGPL-3.0-only-OpenSSL
-
+#include <chiaki/antirecoil.h>
 #include <chiaki/audioreceiver.h>
 #include <chiaki/senkusha.h>
 #include <chiaki/session.h>
@@ -330,17 +330,38 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_join(ChiakiSession *session)
 	return chiaki_thread_join(&session->session_thread, NULL);
 }
 
+// ---------------------------------------------------------
+// FUNÇÃO MODIFICADA COM ANTI-RECOIL (AUTOR: DANIEL)
+// ---------------------------------------------------------
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
-	ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
-	if(err != CHIAKI_ERR_SUCCESS)
-		return err;
-	session->controller_state = *state;
-	if(session->stream_connection.feedback_sender_active)
-		chiaki_feedback_sender_set_controller_state(&session->stream_connection.feedback_sender, &session->controller_state);
-	chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
-	return CHIAKI_ERR_SUCCESS;
+    ChiakiErrorCode err = chiaki_mutex_lock(&session->stream_connection.feedback_sender_mutex);
+    if(err != CHIAKI_ERR_SUCCESS)
+        return err;
+
+    // 1. Criamos uma cópia modificável do estado
+    ChiakiControllerState mod_state = *state;
+
+    // 2. Inicialização preguiçosa (Lazy init) na primeira vez que rodar
+    static bool antirecoil_initialized = false;
+    if (!antirecoil_initialized) {
+        chiaki_antirecoil_init();
+        antirecoil_initialized = true;
+    }
+
+    // 3. PROCESSA O RECOIL AQUI
+    // Isso vai ler seu arquivo TXT e alterar a 'mod_state' se necessário
+    chiaki_antirecoil_process(&mod_state);
+
+    // 4. Copia o estado MODIFICADO para a sessão e envia
+    session->controller_state = mod_state;
+    if(session->stream_connection.feedback_sender_active)
+        chiaki_feedback_sender_set_controller_state(&session->stream_connection.feedback_sender, &session->controller_state);
+    
+    chiaki_mutex_unlock(&session->stream_connection.feedback_sender_mutex);
+    return CHIAKI_ERR_SUCCESS;
 }
+// ---------------------------------------------------------
 
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_login_pin(ChiakiSession *session, const uint8_t *pin, size_t pin_size)
 {
