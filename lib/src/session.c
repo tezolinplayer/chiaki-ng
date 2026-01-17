@@ -1,13 +1,11 @@
 // SPDX-License-Identifier: LicenseRef-AGPL-3.0-only-OpenSSL
 
-// --- ORDEM DE INCLUDES CORRIGIDA ---
 #include <chiaki/audioreceiver.h>
 #include <chiaki/senkusha.h>
-#include <chiaki/session.h> 
-// O antirecoil DEVE ficar abaixo do session.h para reconhecer os tipos
-#include <chiaki/antirecoil.h> 
-// -----------------------------------
-
+#include <chiaki/session.h>
+// --- CORREÇÃO: O include do antirecoil TEM QUE SER AQUI (Linha ~6), NÃO na Linha 2 ---
+#include <chiaki/antirecoil.h>
+// ------------------------------------------------------------------------------------
 #include <chiaki/http.h>
 #include <chiaki/base64.h>
 #include <chiaki/random.h>
@@ -290,7 +288,7 @@ CHIAKI_EXPORT void chiaki_session_fini(ChiakiSession *session)
 	if(!session)
 		return;
     ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
-    (void)err; // CORREÇÃO: Silencia aviso de variável não usada
+    (void)err; // CORREÇÃO: Silenciar erro de variável não usada
 	assert(err == CHIAKI_ERR_SUCCESS);
 	free(session->login_pin);
 	free(session->quit_reason_str);
@@ -319,7 +317,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_start(ChiakiSession *session)
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_stop(ChiakiSession *session)
 {
 	ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
-    (void)err; // CORREÇÃO: Silencia aviso
+    (void)err; // CORREÇÃO: Silenciar erro
 	assert(err == CHIAKI_ERR_SUCCESS);
 
 	session->should_stop = true;
@@ -338,7 +336,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_join(ChiakiSession *session)
 }
 
 // ---------------------------------------------------------
-// FUNÇÃO MODIFICADA COM ANTI-RECOIL
+// FUNÇÃO MODIFICADA COM ANTI-RECOIL E LAZY INIT
 // ---------------------------------------------------------
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_controller_state(ChiakiSession *session, ChiakiControllerState *state)
 {
@@ -377,7 +375,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_login_pin(ChiakiSession *sessio
 	}
 	memcpy(buf, pin, pin_size);
 	ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
-    (void)err; // CORREÇÃO: Silencia aviso
+    (void)err; // CORREÇÃO: Silenciar erro
 	assert(err == CHIAKI_ERR_SUCCESS);
 	if(session->login_pin_entered)
 		free(session->login_pin);
@@ -392,7 +390,7 @@ CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_login_pin(ChiakiSession *sessio
 CHIAKI_EXPORT ChiakiErrorCode chiaki_session_set_stream_connection_switch_received(ChiakiSession *session)
 {
 	ChiakiErrorCode err = chiaki_mutex_lock(&session->state_mutex);
-    (void)err; // CORREÇÃO: Silencia aviso
+    (void)err; // CORREÇÃO: Silenciar erro
 	assert(err == CHIAKI_ERR_SUCCESS);
 	session->stream_connection_switch_received = true;
 	chiaki_mutex_unlock(&session->state_mutex);
@@ -993,7 +991,7 @@ static ChiakiErrorCode session_thread_request_session(ChiakiSession *session, Ch
 	else
 		err = chiaki_recv_http_header(session_sock, buf, sizeof(buf), &header_size, &received_size, &session->stop_pipe, SESSION_EXPECT_TIMEOUT_MS);
 	ChiakiErrorCode mutex_err = chiaki_mutex_lock(&session->state_mutex);
-    (void)mutex_err; // CORREÇÃO: Silencia aviso
+    (void)mutex_err; // CORREÇÃO: Silenciar erro
 	assert(mutex_err == CHIAKI_ERR_SUCCESS);
 	if(err != CHIAKI_ERR_SUCCESS)
 	{
