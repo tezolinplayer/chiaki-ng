@@ -1,0 +1,15 @@
+- name: Install dependencies
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: true
+        install: >-
+          git
+          make
+          mingw-w64-x86_64-toolchain
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-qt6
+          mingw-w64-x86_64-ffmpeg
+          mingw-w64-x86_64-openssl
+          mingw-w64-x86_64-libpl
+          mingw-w64-x86_64-opencv  <-- ADICIONE ESSA LINHA AQUI!
