@@ -1,8 +1,8 @@
-
 #include <chiaki/ffmpegdecoder.h>
 
 #include <libavcodec/avcodec.h>
 #include <libavutil/pixdesc.h>
+#include <stdio.h> // ADICIONADO: Para mostrar o log no console
 
 static enum AVCodecID chiaki_codec_av_codec_id(ChiakiCodec codec)
 {
@@ -206,6 +206,21 @@ CHIAKI_EXPORT AVFrame *chiaki_ffmpeg_decoder_pull_frame(ChiakiFfmpegDecoder *dec
 	decoder->frames_lost = 0;
 	chiaki_mutex_unlock(&decoder->mutex);
 
+    // ==========================================================
+    // [INÍCIO] MODIFICAÇÃO DANIEL - HOOK DE VÍDEO
+    // ==========================================================
+    if (frame) {
+        // Log para confirmar que o vídeo está passando por aqui
+        fprintf(stderr, ">> [DANIEL HOOK] Frame Capturado! Tamanho: %dx%d | Formato: %d\n", 
+                frame->width, frame->height, frame->format);
+
+        // FUTURO: Aqui chamaremos a função de Detecção de Vermelho
+        // Ex: DetectarAlvo(frame);
+    }
+    // ==========================================================
+    // [FIM] MODIFICAÇÃO DANIEL
+    // ==========================================================
+
 	return frame;
 }
 
@@ -221,4 +236,3 @@ CHIAKI_EXPORT enum AVPixelFormat chiaki_ffmpeg_decoder_get_pixel_format(ChiakiFf
 			: AV_PIX_FMT_YUV420P;
 	}
 }
-
